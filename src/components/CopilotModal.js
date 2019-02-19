@@ -152,12 +152,12 @@ class CopilotModal extends Component<Props, State> {
     tooltip.left = 2 * MARGIN;
     if (horizontalPosition === 'left') {
       if (isCircle) {
-        arrow.left = obj.left + obj.width / 2 - MARGIN;
+        arrow.left = obj.left + obj.width / 2 - MARGIN + 2;
       } else {
         arrow.left = obj.left + MARGIN;
       }
     } else {
-      arrow.left = isCircle ? obj.left + obj.width / 2 - MARGIN : tooltip.left + MARGIN;
+      arrow.left = isCircle ? obj.left + obj.width / 2 - MARGIN + 2 : tooltip.left + MARGIN;
     }
     console.log({ layout, obj, tooltip, arrow, tooltip });
 

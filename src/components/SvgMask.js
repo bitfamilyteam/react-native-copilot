@@ -9,6 +9,8 @@ import type { valueXY } from '../types';
 
 const windowDimensions = Dimensions.get('window');
 
+const circle = r => `a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0`;
+
 type Props = {
   size: valueXY,
   position: valueXY,
@@ -56,56 +58,43 @@ class SvgMask extends Component<Props, State> {
 
   path = (size, position, canvasSize): string => {
     const background = `M0,0H${canvasSize.x}V${canvasSize.y}H0V0Z`;
-    const {
+    let {
       x: { _value: xPos },
       y: { _value: yPos },
     } = position;
 
-    const {
+    let {
       x: { _value: xSize },
       y: { _value: ySize },
     } = size;
+    const { isCircle, borderRadius } = this.props;
+    if (isCircle) {
+      xPos += 2;
+      yPos += 2;
+      ySize -= 4;
+      xSize -= 4;
+    }
 
-    const radius = this.props.isCircle ? xSize / 2 : this.props.borderRadius;
+    const radius = isCircle ? xSize / 2 : borderRadius;
 
-    const radiusOffset = (4 / 3) * Math.tan(Math.PI / 8) * radius;
-
+    const getArcByQuarters = (x, y) => `a${radius} ${radius} 0 0 1 ${x * radius} ${y * radius}`;
     const corners = {
-      leftTop:
-        'C' +
-        `${xPos},${yPos + radius - radiusOffset} ` +
-        `${xPos + radius - radiusOffset},${yPos} ` +
-        `${xPos + radius},${yPos}`,
-      rightTop:
-        'C' +
-        `${xPos + xSize - radiusOffset},${yPos} ` +
-        `${xPos + xSize},${yPos + radius - radiusOffset} ` +
-        `${xPos + xSize},${yPos + radius}`,
-      rightBottom:
-        'C' +
-        `${xPos + xSize},${yPos + ySize - radius + radiusOffset} ` +
-        `${xPos + xSize - radius + radiusOffset},${yPos + ySize} ` +
-        `${xPos + xSize - radius},${yPos + ySize}`,
-      leftBottom:
-        'C' +
-        `${xPos + radius - radiusOffset},${yPos + ySize} ` +
-        `${xPos},${yPos + ySize - radius + radiusOffset} ` +
-        `${xPos},${yPos + ySize - radius}`,
+      leftTop: getArcByQuarters(1, -1),
+      rightTop: getArcByQuarters(1, 1),
+      rightBottom: getArcByQuarters(-1, 1),
+      leftBottom: getArcByQuarters(-1, -1),
     };
 
-    const elementMask =
-      `M${xPos},${yPos + radius}${corners.leftTop}H${xPos + xSize - radius}${corners.rightTop}V${yPos +
-        ySize -
-        radius}${corners.rightBottom}H${xPos + radius}` + `${corners.leftBottom}Z`;
-    return `${background}${elementMask}`;
+    const elementMask = isCircle
+      ? circle(radius)
+      : `${corners.leftTop}h${xSize - 2 * radius}${corners.rightTop}` +
+        `v${ySize - 2 * radius}${corners.rightBottom}h${-xSize + 2 * radius}` +
+        `${corners.leftBottom}`;
+    return `${background}M${xPos},${yPos + radius}${elementMask}Z`;
   };
 
   animationListener = (): void => {
-    const d: string = this.path(
-      this.state.size,
-      this.state.position,
-      this.state.canvasSize,
-    );
+    const d: string = this.path(this.state.size, this.state.position, this.state.canvasSize);
     if (this.mask) {
       this.mask.setNativeProps({ d });
     }
