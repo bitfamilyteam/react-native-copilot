@@ -159,7 +159,6 @@ class CopilotModal extends Component<Props, State> {
     } else {
       arrow.left = isCircle ? obj.left + obj.width / 2 - MARGIN + 2 : tooltip.left + MARGIN;
     }
-    console.log({ layout, obj, tooltip, arrow, tooltip });
 
     const animate = {
       top: obj.top,
