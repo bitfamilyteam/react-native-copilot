@@ -65,8 +65,9 @@ class CopilotModal extends Component<Props, State> {
     isCircle: false,
   };
 
-  componentWillReceiveProps(nextProps: Props) {
-    if (this.props.visible === true && nextProps.visible === false) {
+  componentDidUpdate(prevProps: Props) {
+    const { visible } = this.props;
+    if (prevProps.visible === true && visible === false) {
       this.reset();
     }
   }
