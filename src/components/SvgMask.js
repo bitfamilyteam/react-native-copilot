@@ -50,9 +50,10 @@ class SvgMask extends Component<Props, State> {
     this.state.position.addListener(this.animationListener);
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.position !== nextProps.position || this.props.size !== nextProps.size) {
-      this.animate(nextProps.size, nextProps.position);
+  componentDidUpdate({ position: prevPosition, size: prevSize }) {
+    const { position, size } = this.props;
+    if (position !== prevPosition || size !== prevSize) {
+      this.animate(size, position);
     }
   }
 
