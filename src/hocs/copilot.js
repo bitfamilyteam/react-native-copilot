@@ -24,8 +24,7 @@ type State = {
   steps: { [string]: Step },
   currentStep: ?Step,
   visible: boolean,
-  androidStatusBarVisible: boolean,
-  backdropColor: string,
+  isSingleStep: Boolean,
 };
 
 const copilot = ({
@@ -44,6 +43,7 @@ const copilot = ({
       steps: {},
       currentStep: null,
       visible: false,
+      isSingleStep: false,
     };
 
     getChildContext(): { _copilot: CopilotContext } {
@@ -96,7 +96,7 @@ const copilot = ({
 
     isFirstStep = (): boolean => this.state.currentStep === this.getFirstStep();
 
-    isLastStep = (): boolean => this.state.currentStep === this.getLastStep();
+    isLastStep = (): boolean => this.state.isSingleStep || this.state.currentStep === this.getLastStep();
 
     registerStep = (step: Step): void => {
       this.setState(({ steps }) => ({
@@ -126,7 +126,8 @@ const copilot = ({
       await this.setCurrentStep(this.getPrevStep());
     };
 
-    start = async (fromStep?: string): void => {
+    start = async (fromStep?: string, isSingleStep?: boolean = false): void => {
+      this.setState({ isSingleStep });
       const { steps } = this.state;
 
       const currentStep = fromStep ? steps[fromStep] : this.getFirstStep();
