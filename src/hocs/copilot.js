@@ -30,11 +30,15 @@ type State = {
 const copilot = ({
   overlay,
   tooltipComponent,
+  tooltipStyle,
   stepNumberComponent,
   animated,
+  labels,
   androidStatusBarVisible,
   backdropColor,
+  svgMaskPath,
   verticalOffset = 0,
+  wrapperStyle,
   maskBorderRadius,
   circleSteps = [],
 } = {}) => WrappedComponent => {
@@ -186,12 +190,14 @@ const copilot = ({
             isLastStep={this.isLastStep()}
             currentStepNumber={this.getStepNumber()}
             currentStep={this.state.currentStep}
+            labels={labels}
             stepNumberComponent={stepNumberComponent}
             tooltipComponent={tooltipComponent}
             overlay={overlay}
             animated={animated}
             androidStatusBarVisible={androidStatusBarVisible}
             backdropColor={backdropColor}
+            svgMaskPath={svgMaskPath}
             ref={modal => {
               this.modal = modal;
             }}

@@ -1,13 +1,18 @@
 // @flow
 import React, { Component } from 'react';
-import { View, Animated, Easing, Dimensions } from 'react-native';
-// import { Svg } from 'expo';
+import {
+  View,
+  Animated,
+  Easing,
+  Dimensions,
+} from 'react-native';
 import Svg from 'react-native-svg';
 import AnimatedSvgPath from './AnimatedPath';
 
-import type { valueXY } from '../types';
+import type { valueXY, svgMaskPath } from '../types';
 
 const windowDimensions = Dimensions.get('window');
+const defaultSvgPath = ({ size, position, canvasSize }): string => `M0,0H${canvasSize.x}V${canvasSize.y}H0V0ZM${position.x._value},${position.y._value}H${position.x._value + size.x._value}V${position.y._value + size.y._value}H${position.x._value}V${position.y._value}Z`;
 
 const circle = r => `a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0`;
 
@@ -19,6 +24,7 @@ type Props = {
   animationDuration: number,
   animated: boolean,
   backdropColor: string,
+  svgMaskPath?: svgMaskPath,
   borderRadius: number,
   isCircle: boolean,
 };
@@ -33,6 +39,7 @@ class SvgMask extends Component<Props, State> {
   static defaultProps = {
     animationDuration: 300,
     easing: Easing.linear,
+    svgMaskPath: defaultSvgPath,
   };
 
   constructor(props) {
@@ -92,7 +99,11 @@ class SvgMask extends Component<Props, State> {
   };
 
   animationListener = (): void => {
-    const d: string = this.path(this.state.size, this.state.position, this.state.canvasSize);
+    const d: string = this.props.svgMaskPath({
+      size: this.state.size,
+      position: this.state.position,
+      canvasSize: this.state.canvasSize,
+    });
     if (this.mask) {
       this.mask.setNativeProps({ d });
     }
@@ -134,19 +145,25 @@ class SvgMask extends Component<Props, State> {
   render() {
     return (
       <View pointerEvents="box-none" style={this.props.style} onLayout={this.handleLayout}>
-        {this.state.canvasSize ? (
-          <Svg pointerEvents="none" width={this.state.canvasSize.x} height={this.state.canvasSize.y}>
-            <AnimatedSvgPath
-              ref={ref => {
-                this.mask = ref;
-              }}
-              fill={this.props.backdropColor}
-              fillRule="evenodd"
-              strokeWidth={1}
-              d={this.path(this.state.size, this.state.position, this.state.canvasSize)}
-            />
-          </Svg>
-        ) : null}
+        {
+          this.state.canvasSize
+            ? (
+              <Svg pointerEvents="none" width={this.state.canvasSize.x} height={this.state.canvasSize.y}>
+                <AnimatedSvgPath
+                  ref={(ref) => { this.mask = ref; }}
+                  fill={this.props.backdropColor}
+                  fillRule="evenodd"
+                  strokeWidth={1}
+                  d={this.props.svgMaskPath({
+                    size: this.state.size,
+                    position: this.state.position,
+                    canvasSize: this.state.canvasSize,
+                  })}
+                />
+              </Svg>
+            )
+            : null
+        }
       </View>
     );
   }
