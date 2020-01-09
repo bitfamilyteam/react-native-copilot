@@ -12,9 +12,51 @@ import AnimatedSvgPath from './AnimatedPath';
 import type { valueXY, svgMaskPath } from '../types';
 
 const windowDimensions = Dimensions.get('window');
-const defaultSvgPath = ({ size, position, canvasSize }): string => `M0,0H${canvasSize.x}V${canvasSize.y}H0V0ZM${position.x._value},${position.y._value}H${position.x._value + size.x._value}V${position.y._value + size.y._value}H${position.x._value}V${position.y._value}Z`;
 
-const circle = r => `a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0`;
+const getRadius = ({ xSize, ySize, borderRadius, isCircle }) => {
+  if (isCircle) {
+    return xSize / 2;
+  }
+  return borderRadius * 2 > ySize ? ySize / 2 : borderRadius;
+}
+
+const circle = r => `a${r} ${r} 0 0 0 ${2 * r} 0a${r} ${r} 0 0 0 ${-2 * r} 0`;
+
+const getArcByQuarters = (x, y, radius) => `a${radius} ${radius} 0 0 1 ${x * radius} ${y * radius}`;
+const getCorners = r => ({
+  leftTop: getArcByQuarters(1, -1, r),
+  rightTop: getArcByQuarters(1, 1, r),
+  rightBottom: getArcByQuarters(-1, 1, r),
+  leftBottom: getArcByQuarters(-1, -1, r),
+});
+
+const defaultSvgPath = ({ size, position, canvasSize, isCircle, borderRadius }): string => {
+  const background = `M0,0H${canvasSize.x}V${canvasSize.y}H0V0Z`;
+  let {
+    x: { _value: xPos },
+    y: { _value: yPos },
+  } = position;
+
+  let {
+    x: { _value: xSize },
+    y: { _value: ySize },
+  } = size;
+
+  if (isCircle) {
+    // yPos += 0.30;
+  }
+
+  const radius = getRadius({ xSize, ySize, borderRadius, isCircle });
+
+  const corners = getCorners(radius);
+
+  const elementMask = isCircle
+    ? circle(radius)
+    : `${corners.leftTop}h${xSize - 2 * radius}${corners.rightTop}` +
+      `v${ySize - 2 * radius}${corners.rightBottom}h${-xSize + 2 * radius}` +
+      `${corners.leftBottom}`;
+  return `${background}M${xPos},${yPos + radius}${elementMask}Z`;
+};
 
 type Props = {
   size: valueXY,
@@ -64,45 +106,13 @@ class SvgMask extends Component<Props, State> {
     }
   }
 
-  path = (size, position, canvasSize): string => {
-    const background = `M0,0H${canvasSize.x}V${canvasSize.y}H0V0Z`;
-    let {
-      x: { _value: xPos },
-      y: { _value: yPos },
-    } = position;
-
-    let {
-      x: { _value: xSize },
-      y: { _value: ySize },
-    } = size;
-    const { isCircle, borderRadius } = this.props;
-    if (isCircle) {
-      yPos += 0.2;
-    }
-
-    const radius = isCircle ? xSize / 2 : borderRadius * 2 > ySize ? ySize / 2 : borderRadius;
-
-    const getArcByQuarters = (x, y) => `a${radius} ${radius} 0 0 1 ${x * radius} ${y * radius}`;
-    const corners = {
-      leftTop: getArcByQuarters(1, -1),
-      rightTop: getArcByQuarters(1, 1),
-      rightBottom: getArcByQuarters(-1, 1),
-      leftBottom: getArcByQuarters(-1, -1),
-    };
-
-    const elementMask = isCircle
-      ? circle(radius)
-      : `${corners.leftTop}h${xSize - 2 * radius}${corners.rightTop}` +
-        `v${ySize - 2 * radius}${corners.rightBottom}h${-xSize + 2 * radius}` +
-        `${corners.leftBottom}`;
-    return `${background}M${xPos},${yPos + radius}${elementMask}Z`;
-  };
-
   animationListener = (): void => {
     const d: string = this.props.svgMaskPath({
       size: this.state.size,
       position: this.state.position,
       canvasSize: this.state.canvasSize,
+      isCircle: this.props.isCircle,
+      borderRadius: this.props.borderRadius,
     });
     if (this.mask) {
       this.mask.setNativeProps({ d });
@@ -158,6 +168,8 @@ class SvgMask extends Component<Props, State> {
                     size: this.state.size,
                     position: this.state.position,
                     canvasSize: this.state.canvasSize,
+                    isCircle: this.props.isCircle,
+                    borderRadius: this.props.borderRadius,
                   })}
                 />
               </Svg>
