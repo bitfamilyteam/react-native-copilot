@@ -70,13 +70,10 @@ class SvgMask extends Component<Props, State> {
     } = size;
     const { isCircle, borderRadius } = this.props;
     if (isCircle) {
-      xPos += 2;
-      yPos += 2;
-      ySize -= 4;
-      xSize -= 4;
+      yPos += 0.2;
     }
 
-    const radius = isCircle ? xSize / 2 : borderRadius;
+    const radius = isCircle ? xSize / 2 : borderRadius * 2 > ySize ? ySize / 2 : borderRadius;
 
     const getArcByQuarters = (x, y) => `a${radius} ${radius} 0 0 1 ${x * radius} ${y * radius}`;
     const corners = {
