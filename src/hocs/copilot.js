@@ -171,7 +171,7 @@ const copilot = ({
 
     render() {
       return (
-        <View style={{ flex: 1 }}>
+        <View style={wrapperStyle || { flex: 1 }}>
           <WrappedComponent
             {...this.props}
             start={this.start}
@@ -193,6 +193,7 @@ const copilot = ({
             labels={labels}
             stepNumberComponent={stepNumberComponent}
             tooltipComponent={tooltipComponent}
+            tooltipStyle={tooltipStyle}
             overlay={overlay}
             animated={animated}
             androidStatusBarVisible={androidStatusBarVisible}
