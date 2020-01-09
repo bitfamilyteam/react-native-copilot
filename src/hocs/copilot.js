@@ -8,7 +8,6 @@ import mitt from 'mitt';
 import hoistStatics from 'hoist-non-react-statics';
 
 import CopilotModal from '../components/CopilotModal';
-import { OFFSET_WIDTH } from '../components/style';
 
 import { getFirstStep, getLastStep, getStepNumber, getPrevStep, getNextStep } from '../utilities';
 
@@ -162,10 +161,10 @@ const copilot = ({
       const size = await this.state.currentStep.target.measure();
 
       await this.modal.animateMove({
-        width: size.width + OFFSET_WIDTH,
-        height: size.height + OFFSET_WIDTH,
-        left: size.x - OFFSET_WIDTH / 2,
-        top: size.y - OFFSET_WIDTH / 2 + verticalOffset,
+        width: size.width,
+        height: size.height,
+        left: size.x,
+        top: size.y + verticalOffset,
       });
     }
 

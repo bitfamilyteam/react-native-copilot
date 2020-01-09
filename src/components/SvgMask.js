@@ -42,10 +42,6 @@ const defaultSvgPath = ({ size, position, canvasSize, isCircle, borderRadius }):
     y: { _value: ySize },
   } = size;
 
-  if (isCircle) {
-    // yPos += 0.30;
-  }
-
   const radius = getRadius({ xSize, ySize, borderRadius, isCircle });
 
   const corners = getCorners(radius);
