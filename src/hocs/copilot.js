@@ -8,7 +8,6 @@ import mitt from 'mitt';
 import hoistStatics from 'hoist-non-react-statics';
 
 import CopilotModal from '../components/CopilotModal';
-import { OFFSET_WIDTH } from '../components/style';
 
 import { getFirstStep, getLastStep, getStepNumber, getPrevStep, getNextStep } from '../utilities';
 
@@ -30,11 +29,15 @@ type State = {
 const copilot = ({
   overlay,
   tooltipComponent,
+  tooltipStyle,
   stepNumberComponent,
   animated,
+  labels,
   androidStatusBarVisible,
   backdropColor,
+  svgMaskPath,
   verticalOffset = 0,
+  wrapperStyle,
   maskBorderRadius,
   circleSteps = [],
 } = {}) => WrappedComponent => {
@@ -158,16 +161,16 @@ const copilot = ({
       const size = await this.state.currentStep.target.measure();
 
       await this.modal.animateMove({
-        width: size.width + OFFSET_WIDTH,
-        height: size.height + OFFSET_WIDTH,
-        left: size.x - OFFSET_WIDTH / 2,
-        top: size.y - OFFSET_WIDTH / 2 + verticalOffset,
+        width: size.width,
+        height: size.height,
+        left: size.x,
+        top: size.y + verticalOffset,
       });
     }
 
     render() {
       return (
-        <View style={{ flex: 1 }}>
+        <View style={wrapperStyle || { flex: 1 }}>
           <WrappedComponent
             {...this.props}
             start={this.start}
@@ -186,12 +189,15 @@ const copilot = ({
             isLastStep={this.isLastStep()}
             currentStepNumber={this.getStepNumber()}
             currentStep={this.state.currentStep}
+            labels={labels}
             stepNumberComponent={stepNumberComponent}
             tooltipComponent={tooltipComponent}
+            tooltipStyle={tooltipStyle}
             overlay={overlay}
             animated={animated}
             androidStatusBarVisible={androidStatusBarVisible}
             backdropColor={backdropColor}
+            svgMaskPath={svgMaskPath}
             ref={modal => {
               this.modal = modal;
             }}

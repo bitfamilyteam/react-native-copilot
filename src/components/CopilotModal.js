@@ -4,6 +4,7 @@ import { Animated, Easing, View, NativeModules, Modal, StatusBar, Platform } fro
 import Tooltip from './Tooltip';
 import StepNumber from './StepNumber';
 import styles, { MARGIN, ARROW_SIZE, STEP_NUMBER_DIAMETER, STEP_NUMBER_RADIUS } from './style';
+import type { SvgMaskPathFn } from '../types';
 
 type Props = {
   stop: () => void,
@@ -19,11 +20,14 @@ type Props = {
   easing: ?func,
   animationDuration: ?number,
   tooltipComponent: ?React$Component,
+  tooltipStyle?: Object,
   stepNumberComponent: ?React$Component,
   overlay: 'svg' | 'view',
   animated: boolean,
   androidStatusBarVisible: boolean,
   backdropColor: string,
+  labels: Object,
+  svgMaskPath?: SvgMaskPathFn,
 };
 
 type State = {
@@ -44,6 +48,7 @@ class CopilotModal extends Component<Props, State> {
     easing: Easing.elastic(0.7),
     animationDuration: 400,
     tooltipComponent: Tooltip,
+    tooltipStyle: {},
     stepNumberComponent: StepNumber,
     // If react-native-svg native module was avaialble, use svg as the default overlay component
     overlay: typeof NativeModules.RNSVGSvgViewManager !== 'undefined' ? 'svg' : 'view',
@@ -51,6 +56,7 @@ class CopilotModal extends Component<Props, State> {
     animated: typeof NativeModules.RNSVGSvgViewManager !== 'undefined',
     androidStatusBarVisible: false,
     backdropColor: 'rgba(0, 0, 0, 0.4)',
+    labels: {},
   };
 
   state = {
@@ -247,6 +253,7 @@ class CopilotModal extends Component<Props, State> {
         easing={this.props.easing}
         animationDuration={this.props.animationDuration}
         backdropColor={this.props.backdropColor}
+        svgMaskPath={this.props.svgMaskPath}
       />
     );
   }
@@ -272,7 +279,7 @@ class CopilotModal extends Component<Props, State> {
         />
       </Animated.View>,
       <Animated.View key="arrow" style={[styles.arrow, this.state.arrow]} />,
-      <Animated.View key="tooltip" style={[styles.tooltip, this.state.tooltip]}>
+      <Animated.View key="tooltip" style={[styles.tooltip, this.props.tooltipStyle, this.state.tooltip]}>
         <TooltipComponent
           isFirstStep={this.props.isFirstStep}
           isLastStep={this.props.isLastStep}
@@ -280,6 +287,7 @@ class CopilotModal extends Component<Props, State> {
           handleNext={this.handleNext}
           handlePrev={this.handlePrev}
           handleStop={this.handleStop}
+          labels={this.props.labels}
         />
       </Animated.View>,
     ];

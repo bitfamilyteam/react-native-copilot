@@ -1,15 +1,58 @@
 // @flow
 import React, { Component } from 'react';
-import { View, Animated, Easing, Dimensions } from 'react-native';
-// import { Svg } from 'expo';
+import {
+  View,
+  Animated,
+  Easing,
+  Dimensions,
+} from 'react-native';
 import Svg from 'react-native-svg';
 import AnimatedSvgPath from './AnimatedPath';
 
-import type { valueXY } from '../types';
+import type { valueXY, svgMaskPath } from '../types';
 
 const windowDimensions = Dimensions.get('window');
 
-const circle = r => `a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0`;
+const getRadius = ({ xSize, ySize, borderRadius, isCircle }) => {
+  if (isCircle) {
+    return xSize / 2;
+  }
+  return borderRadius * 2 > ySize ? ySize / 2 : borderRadius;
+}
+
+const circle = r => `a${r} ${r} 0 0 0 ${2 * r} 0a${r} ${r} 0 0 0 ${-2 * r} 0`;
+
+const getArcByQuarters = (x, y, radius) => `a${radius} ${radius} 0 0 1 ${x * radius} ${y * radius}`;
+const getCorners = r => ({
+  leftTop: getArcByQuarters(1, -1, r),
+  rightTop: getArcByQuarters(1, 1, r),
+  rightBottom: getArcByQuarters(-1, 1, r),
+  leftBottom: getArcByQuarters(-1, -1, r),
+});
+
+const defaultSvgPath = ({ size, position, canvasSize, isCircle, borderRadius }): string => {
+  const background = `M0,0H${canvasSize.x}V${canvasSize.y}H0V0Z`;
+  let {
+    x: { _value: xPos },
+    y: { _value: yPos },
+  } = position;
+
+  let {
+    x: { _value: xSize },
+    y: { _value: ySize },
+  } = size;
+
+  const radius = getRadius({ xSize, ySize, borderRadius, isCircle });
+
+  const corners = getCorners(radius);
+
+  const elementMask = isCircle
+    ? circle(radius)
+    : `${corners.leftTop}h${xSize - 2 * radius}${corners.rightTop}` +
+      `v${ySize - 2 * radius}${corners.rightBottom}h${-xSize + 2 * radius}` +
+      `${corners.leftBottom}`;
+  return `${background}M${xPos},${yPos + radius}${elementMask}Z`;
+};
 
 type Props = {
   size: valueXY,
@@ -19,6 +62,7 @@ type Props = {
   animationDuration: number,
   animated: boolean,
   backdropColor: string,
+  svgMaskPath?: svgMaskPath,
   borderRadius: number,
   isCircle: boolean,
 };
@@ -33,6 +77,7 @@ class SvgMask extends Component<Props, State> {
   static defaultProps = {
     animationDuration: 300,
     easing: Easing.linear,
+    svgMaskPath: defaultSvgPath,
   };
 
   constructor(props) {
@@ -57,45 +102,14 @@ class SvgMask extends Component<Props, State> {
     }
   }
 
-  path = (size, position, canvasSize): string => {
-    const background = `M0,0H${canvasSize.x}V${canvasSize.y}H0V0Z`;
-    let {
-      x: { _value: xPos },
-      y: { _value: yPos },
-    } = position;
-
-    let {
-      x: { _value: xSize },
-      y: { _value: ySize },
-    } = size;
-    const { isCircle, borderRadius } = this.props;
-    if (isCircle) {
-      xPos += 2;
-      yPos += 2;
-      ySize -= 4;
-      xSize -= 4;
-    }
-
-    const radius = isCircle ? xSize / 2 : borderRadius;
-
-    const getArcByQuarters = (x, y) => `a${radius} ${radius} 0 0 1 ${x * radius} ${y * radius}`;
-    const corners = {
-      leftTop: getArcByQuarters(1, -1),
-      rightTop: getArcByQuarters(1, 1),
-      rightBottom: getArcByQuarters(-1, 1),
-      leftBottom: getArcByQuarters(-1, -1),
-    };
-
-    const elementMask = isCircle
-      ? circle(radius)
-      : `${corners.leftTop}h${xSize - 2 * radius}${corners.rightTop}` +
-        `v${ySize - 2 * radius}${corners.rightBottom}h${-xSize + 2 * radius}` +
-        `${corners.leftBottom}`;
-    return `${background}M${xPos},${yPos + radius}${elementMask}Z`;
-  };
-
   animationListener = (): void => {
-    const d: string = this.path(this.state.size, this.state.position, this.state.canvasSize);
+    const d: string = this.props.svgMaskPath({
+      size: this.state.size,
+      position: this.state.position,
+      canvasSize: this.state.canvasSize,
+      isCircle: this.props.isCircle,
+      borderRadius: this.props.borderRadius,
+    });
     if (this.mask) {
       this.mask.setNativeProps({ d });
     }
@@ -137,19 +151,27 @@ class SvgMask extends Component<Props, State> {
   render() {
     return (
       <View pointerEvents="box-none" style={this.props.style} onLayout={this.handleLayout}>
-        {this.state.canvasSize ? (
-          <Svg pointerEvents="none" width={this.state.canvasSize.x} height={this.state.canvasSize.y}>
-            <AnimatedSvgPath
-              ref={ref => {
-                this.mask = ref;
-              }}
-              fill={this.props.backdropColor}
-              fillRule="evenodd"
-              strokeWidth={1}
-              d={this.path(this.state.size, this.state.position, this.state.canvasSize)}
-            />
-          </Svg>
-        ) : null}
+        {
+          this.state.canvasSize
+            ? (
+              <Svg pointerEvents="none" width={this.state.canvasSize.x} height={this.state.canvasSize.y}>
+                <AnimatedSvgPath
+                  ref={(ref) => { this.mask = ref; }}
+                  fill={this.props.backdropColor}
+                  fillRule="evenodd"
+                  strokeWidth={1}
+                  d={this.props.svgMaskPath({
+                    size: this.state.size,
+                    position: this.state.position,
+                    canvasSize: this.state.canvasSize,
+                    isCircle: this.props.isCircle,
+                    borderRadius: this.props.borderRadius,
+                  })}
+                />
+              </Svg>
+            )
+            : null
+        }
       </View>
     );
   }
