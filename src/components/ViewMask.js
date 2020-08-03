@@ -39,7 +39,10 @@ class ViewMask extends Component<Props, State> {
     }
   }
 
-  animate = (size: valueXY = this.props.size, position: valueXY = this.props.position): void => {
+  animate = (
+    size: valueXY = this.props.size,
+    position: valueXY = this.props.position,
+  ): void => {
     if (this.state.animated) {
       Animated.parallel([
         Animated.timing(this.state.size, {
@@ -60,20 +63,27 @@ class ViewMask extends Component<Props, State> {
       this.state.position.setValue(position);
       this.setState({ animated: this.props.animated });
     }
-  }
+  };
 
   render() {
     const { size, position } = this.state;
     const width = this.props.layout ? this.props.layout.width : 500;
     const height = this.props.layout ? this.props.layout.height : 500;
 
-    const leftOverlayRight = Animated.add(width, Animated.multiply(position.x, -1));
+    const leftOverlayRight = Animated.add(
+      width,
+      Animated.multiply(position.x, -1),
+    );
     const rightOverlayLeft = Animated.add(size.x, position.x);
     const bottomOverlayTopBoundary = Animated.add(size.y, position.y);
-    const topOverlayBottomBoundary = Animated.add(height, Animated.multiply(-1, position.y));
+    const topOverlayBottomBoundary = Animated.add(
+      height,
+      Animated.multiply(-1, position.y),
+    );
     const verticalOverlayLeftBoundary = position.x;
     const verticalOverlayRightBoundary = Animated.add(
-      width, Animated.multiply(-1, rightOverlayLeft),
+      width,
+      Animated.multiply(-1, rightOverlayLeft),
     );
 
     return (
@@ -84,7 +94,8 @@ class ViewMask extends Component<Props, State> {
             {
               right: leftOverlayRight,
               backgroundColor: this.props.backdropColor,
-            }]}
+            },
+          ]}
         />
         <Animated.View
           style={[
@@ -92,7 +103,8 @@ class ViewMask extends Component<Props, State> {
             {
               left: rightOverlayLeft,
               backgroundColor: this.props.backdropColor,
-            }]}
+            },
+          ]}
         />
         <Animated.View
           style={[
@@ -120,6 +132,5 @@ class ViewMask extends Component<Props, State> {
     );
   }
 }
-
 
 export default ViewMask;

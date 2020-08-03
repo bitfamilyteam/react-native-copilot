@@ -1,11 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import {
-  View,
-  Animated,
-  Easing,
-  Dimensions,
-} from 'react-native';
+import { View, Animated, Easing, Dimensions } from 'react-native';
 import Svg from 'react-native-svg';
 import AnimatedSvgPath from './AnimatedPath';
 
@@ -13,16 +8,19 @@ import type { valueXY, svgMaskPath } from '../types';
 
 const windowDimensions = Dimensions.get('window');
 
-const getRadius = ({ xSize, ySize, borderRadius, isCircle }) => {
+const getRadius = ({
+  xSize, ySize, borderRadius, isCircle,
+}) => {
   if (isCircle) {
     return xSize / 2;
   }
   return borderRadius * 2 > ySize ? ySize / 2 : borderRadius;
-}
+};
 
 const circle = r => `a${r} ${r} 0 0 0 ${2 * r} 0a${r} ${r} 0 0 0 ${-2 * r} 0`;
 
-const getArcByQuarters = (x, y, radius) => `a${radius} ${radius} 0 0 1 ${x * radius} ${y * radius}`;
+const getArcByQuarters = (x, y, radius) =>
+  `a${radius} ${radius} 0 0 1 ${x * radius} ${y * radius}`;
 const getCorners = r => ({
   leftTop: getArcByQuarters(1, -1, r),
   rightTop: getArcByQuarters(1, 1, r),
@@ -30,19 +28,27 @@ const getCorners = r => ({
   leftBottom: getArcByQuarters(-1, -1, r),
 });
 
-const defaultSvgPath = ({ size, position, canvasSize, isCircle, borderRadius }): string => {
+const defaultSvgPath = ({
+  size,
+  position,
+  canvasSize,
+  isCircle,
+  borderRadius,
+}): string => {
   const background = `M0,0H${canvasSize.x}V${canvasSize.y}H0V0Z`;
-  let {
+  const {
     x: { _value: xPos },
     y: { _value: yPos },
   } = position;
 
-  let {
+  const {
     x: { _value: xSize },
     y: { _value: ySize },
   } = size;
 
-  const radius = getRadius({ xSize, ySize, borderRadius, isCircle });
+  const radius = getRadius({
+    xSize, ySize, borderRadius, isCircle,
+  });
 
   const corners = getCorners(radius);
 
@@ -115,7 +121,10 @@ class SvgMask extends Component<Props, State> {
     }
   };
 
-  animate = (size: valueXY = this.props.size, position: valueXY = this.props.position): void => {
+  animate = (
+    size: valueXY = this.props.size,
+    position: valueXY = this.props.position,
+  ): void => {
     if (this.props.animated) {
       Animated.parallel([
         Animated.timing(this.state.size, {
@@ -152,28 +161,34 @@ class SvgMask extends Component<Props, State> {
 
   render() {
     return (
-      <View pointerEvents="box-none" style={this.props.style} onLayout={this.handleLayout}>
-        {
-          this.state.canvasSize
-            ? (
-              <Svg pointerEvents="none" width={this.state.canvasSize.x} height={this.state.canvasSize.y}>
-                <AnimatedSvgPath
-                  ref={(ref) => { this.mask = ref; }}
-                  fill={this.props.backdropColor}
-                  fillRule="evenodd"
-                  strokeWidth={1}
-                  d={this.props.svgMaskPath({
-                    size: this.state.size,
-                    position: this.state.position,
-                    canvasSize: this.state.canvasSize,
-                    isCircle: this.props.isCircle,
-                    borderRadius: this.props.borderRadius,
-                  })}
-                />
-              </Svg>
-            )
-            : null
-        }
+      <View
+        pointerEvents="box-none"
+        style={this.props.style}
+        onLayout={this.handleLayout}
+      >
+        {this.state.canvasSize ? (
+          <Svg
+            pointerEvents="none"
+            width={this.state.canvasSize.x}
+            height={this.state.canvasSize.y}
+          >
+            <AnimatedSvgPath
+              ref={(ref) => {
+                this.mask = ref;
+              }}
+              fill={this.props.backdropColor}
+              fillRule="evenodd"
+              strokeWidth={1}
+              d={this.props.svgMaskPath({
+                size: this.state.size,
+                position: this.state.position,
+                canvasSize: this.state.canvasSize,
+                isCircle: this.props.isCircle,
+                borderRadius: this.props.borderRadius,
+              })}
+            />
+          </Svg>
+        ) : null}
       </View>
     );
   }

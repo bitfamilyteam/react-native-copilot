@@ -10,18 +10,31 @@ import SvgMask from '../components/SvgMask';
 const WalkthroughableView = walkthroughable(View);
 
 type SampleComponentProps = {
-  secondStepActive?: boolean
+  secondStepActive?: boolean,
 };
 
 const SampleComponent = ({ secondStepActive }: SampleComponentProps) => (
   <View>
-    <CopilotStep order={0} name="step-1" text="This is the description for the first step">
+    <CopilotStep
+      order={0}
+      name="step-1"
+      text="This is the description for the first step"
+    >
       <WalkthroughableView />
     </CopilotStep>
-    <CopilotStep order={1} name="step-2" active={secondStepActive} text="This is the description for the second step">
+    <CopilotStep
+      order={1}
+      name="step-2"
+      active={secondStepActive}
+      text="This is the description for the second step"
+    >
       <WalkthroughableView />
     </CopilotStep>
-    <CopilotStep order={3} name="step-3" text="This is the description for the third step">
+    <CopilotStep
+      order={3}
+      name="step-3"
+      text="This is the description for the third step"
+    >
       <WalkthroughableView />
     </CopilotStep>
   </View>
@@ -87,19 +100,27 @@ it('updates the tooltip text when navigating through the steps', async () => {
     testID: 'stepDescription',
   });
 
-  expect(textComponent.props.children).toBe('This is the description for the first step');
+  expect(textComponent.props.children).toBe(
+    'This is the description for the first step',
+  );
 
   await tree.root.instance.next();
 
-  expect(textComponent.props.children).toBe('This is the description for the second step');
+  expect(textComponent.props.children).toBe(
+    'This is the description for the second step',
+  );
 
   await tree.root.instance.next();
 
-  expect(textComponent.props.children).toBe('This is the description for the third step');
+  expect(textComponent.props.children).toBe(
+    'This is the description for the third step',
+  );
 
   await tree.root.instance.prev();
 
-  expect(textComponent.props.children).toBe('This is the description for the second step');
+  expect(textComponent.props.children).toBe(
+    'This is the description for the second step',
+  );
 });
 
 it('hides the tutorial tooltip once the tutorial is finished', async () => {
@@ -120,9 +141,7 @@ it('hides the tutorial tooltip once the tutorial is finished', async () => {
 });
 
 it('shows the custom tooltip component if specified', async () => {
-  const TooltipComponent = () => (
-    <View />
-  );
+  const TooltipComponent = () => <View />;
 
   const CopilotComponent = copilot({
     tooltipComponent: TooltipComponent,
@@ -154,14 +173,22 @@ it('skips a step if disabled', async () => {
     testID: 'stepDescription',
   });
 
-  expect(textComponent.props.children).toBe('This is the description for the first step');
+  expect(textComponent.props.children).toBe(
+    'This is the description for the first step',
+  );
 
   await tree.root.instance.next();
 
-  expect(textComponent.props.children).not.toBe('This is the description for the second step');
-  expect(textComponent.props.children).toBe('This is the description for the third step');
+  expect(textComponent.props.children).not.toBe(
+    'This is the description for the second step',
+  );
+  expect(textComponent.props.children).toBe(
+    'This is the description for the third step',
+  );
 
   await tree.root.instance.prev();
 
-  expect(textComponent.props.children).toBe('This is the description for the first step');
+  expect(textComponent.props.children).toBe(
+    'This is the description for the first step',
+  );
 });

@@ -11,7 +11,7 @@ export type CopilotContext = {
   registerStep: (Step) => void,
   unregisterStep: (name: string) => void,
   getCurrentStep: () => Step,
-}
+};
 
 export type valueXY = {
   x: number,
@@ -23,6 +23,6 @@ export type SvgMaskPathFn = (args: {
   position: Animated.valueXY,
   canvasSize: {
     x: number,
-    y: number
-  }
+    y: number,
+  },
 }) => string;

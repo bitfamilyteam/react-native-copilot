@@ -8,12 +8,14 @@ class SvgPathWrap extends Component {
     if (this._component) {
       this._component.setNativeProps(props);
     }
-  }
+  };
 
   render() {
     return (
       <Path
-        ref={(component) => { this._component = component; }}
+        ref={(component) => {
+          this._component = component;
+        }}
         {...this.props}
       />
     );
