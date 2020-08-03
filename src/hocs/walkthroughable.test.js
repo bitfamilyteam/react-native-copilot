@@ -15,18 +15,11 @@ const walkthroughableComponents = [
   WalkthroughableTextInput,
 ];
 
-const nativeComponents = [
-  View,
-  Text,
-  ScrollView,
-  TextInput,
-];
+const nativeComponents = [View, Text, ScrollView, TextInput];
 
 it('spreads the copilot prop object on the wrapped component', () => {
   const tree = renderer.create(
-    <WalkthroughableView
-      copilot={{ keyForNum: 1, keyForStr: 'hello' }}
-    />,
+    <WalkthroughableView copilot={{ keyForNum: 1, keyForStr: 'hello' }} />,
   );
 
   const { props } = tree.root.findByType(View);

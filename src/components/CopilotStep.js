@@ -15,23 +15,20 @@ type Props = {
 class CopilotStep extends Component<Props> {
   static contextTypes = {
     _copilot: PropTypes.object,
-  }
+  };
 
   context: {
     _copilot: CopilotContext,
-  }
+  };
 
   render() {
     const currentStep = this.context._copilot.getCurrentStep();
 
-    return createElement(
-      ConnectedCopilotStep,
-      {
-        ...this.props,
-        _copilot: this.context._copilot,
-        visible: currentStep && currentStep.name === this.props.name,
-      },
-    );
+    return createElement(ConnectedCopilotStep, {
+      ...this.props,
+      _copilot: this.context._copilot,
+      visible: currentStep && currentStep.name === this.props.name,
+    });
   }
 }
 

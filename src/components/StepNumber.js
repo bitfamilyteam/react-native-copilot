@@ -8,9 +8,7 @@ type Props = {
   currentStepNumber: number,
 };
 
-const StepNumber = ({
-  currentStepNumber,
-}: Props) => (
+const StepNumber = ({ currentStepNumber }: Props) => (
   <View style={styles.stepNumber}>
     <Text style={[styles.stepNumberText]}>{currentStepNumber}</Text>
   </View>

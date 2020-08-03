@@ -9,7 +9,7 @@ type Props = {
   order: number,
   active?: boolean,
   _copilot: CopilotContext,
-  children: React$Element
+  children: React$Element,
 };
 
 class ConnectedCopilotStep extends Component<Props> {
@@ -57,10 +57,16 @@ class ConnectedCopilotStep extends Component<Props> {
   }
 
   measure() {
-    if (typeof __TEST__ !== 'undefined' && __TEST__) { // eslint-disable-line no-undef
-      return new Promise(resolve => resolve({
-        x: 0, y: 0, width: 0, height: 0,
-      }));
+    if (typeof __TEST__ !== 'undefined' && __TEST__) {
+      // eslint-disable-line no-undef
+      return new Promise(resolve =>
+        resolve({
+          x: 0,
+          y: 0,
+          width: 0,
+          height: 0,
+        }),
+      );
     }
 
     return new Promise((resolve, reject) => {
@@ -68,9 +74,13 @@ class ConnectedCopilotStep extends Component<Props> {
         // Wait until the wrapper element appears
         if (this.wrapper && this.wrapper.measure) {
           this.wrapper.measure(
-            (ox, oy, width, height, x, y) => resolve({
-              x, y, width, height,
-            }),
+            (ox, oy, width, height, x, y) =>
+              resolve({
+                x,
+                y,
+                width,
+                height,
+              }),
             reject,
           );
         } else {
@@ -84,8 +94,10 @@ class ConnectedCopilotStep extends Component<Props> {
 
   render() {
     const copilot = {
-      ref: (wrapper) => { this.wrapper = wrapper; },
-      onLayout: () => { }, // Android hack
+      ref: (wrapper) => {
+        this.wrapper = wrapper;
+      },
+      onLayout: () => {}, // Android hack
     };
 
     return React.cloneElement(this.props.children, { copilot });

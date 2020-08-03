@@ -9,7 +9,13 @@ import hoistStatics from 'hoist-non-react-statics';
 
 import CopilotModal from '../components/CopilotModal';
 
-import { getFirstStep, getLastStep, getStepNumber, getPrevStep, getNextStep } from '../utilities';
+import {
+  getFirstStep,
+  getLastStep,
+  getStepNumber,
+  getPrevStep,
+  getNextStep,
+} from '../utilities';
 
 import type { Step, CopilotContext } from '../types';
 
@@ -30,6 +36,7 @@ const copilot = ({
   overlay,
   tooltipComponent,
   tooltipStyle,
+  arrowStyle,
   stepNumberComponent,
   animated,
   labels,
@@ -40,7 +47,7 @@ const copilot = ({
   wrapperStyle,
   maskBorderRadius,
   circleSteps = [],
-} = {}) => WrappedComponent => {
+} = {}) => (WrappedComponent) => {
   class Copilot extends Component<any, State> {
     state = {
       steps: {},
@@ -67,15 +74,18 @@ const copilot = ({
       this.mounted = false;
     }
 
-    getStepNumber = (step: ?Step = this.state.currentStep): number => getStepNumber(this.state.steps, step);
+    getStepNumber = (step: ?Step = this.state.currentStep): number =>
+      getStepNumber(this.state.steps, step);
 
     getFirstStep = (): ?Step => getFirstStep(this.state.steps);
 
     getLastStep = (): ?Step => getLastStep(this.state.steps);
 
-    getPrevStep = (step: ?Step = this.state.currentStep): ?Step => getPrevStep(this.state.steps, step);
+    getPrevStep = (step: ?Step = this.state.currentStep): ?Step =>
+      getPrevStep(this.state.steps, step);
 
-    getNextStep = (step: ?Step = this.state.currentStep): ?Step => getNextStep(this.state.steps, step);
+    getNextStep = (step: ?Step = this.state.currentStep): ?Step =>
+      getNextStep(this.state.steps, step);
 
     setCurrentStep = async (step: Step, move?: boolean = true): void => {
       await this.setState({ currentStep: step });
@@ -87,7 +97,7 @@ const copilot = ({
     };
 
     setVisibility = (visible: boolean): void =>
-      new Promise(resolve => {
+      new Promise((resolve) => {
         this.setState({ visible }, () => resolve());
       });
 
@@ -99,7 +109,8 @@ const copilot = ({
 
     isFirstStep = (): boolean => this.state.currentStep === this.getFirstStep();
 
-    isLastStep = (): boolean => this.state.isSingleStep || this.state.currentStep === this.getLastStep();
+    isLastStep = (): boolean =>
+      this.state.isSingleStep || this.state.currentStep === this.getLastStep();
 
     registerStep = (step: Step): void => {
       this.setState(({ steps }) => ({
@@ -194,12 +205,13 @@ const copilot = ({
             stepNumberComponent={stepNumberComponent}
             tooltipComponent={tooltipComponent}
             tooltipStyle={tooltipStyle}
+            arrowStyle={arrowStyle}
             overlay={overlay}
             animated={animated}
             androidStatusBarVisible={androidStatusBarVisible}
             backdropColor={backdropColor}
             svgMaskPath={svgMaskPath}
-            ref={modal => {
+            ref={(modal) => {
               this.modal = modal;
             }}
           />
