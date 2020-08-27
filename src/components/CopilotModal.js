@@ -25,6 +25,7 @@ type Props = {
   prev: () => void,
   maskBorderRadius: number,
   circleSteps: Array<number>,
+  waitBeforeSteps: Array<number>,
   currentStepNumber: number,
   currentStep: ?Step,
   visible: boolean,
