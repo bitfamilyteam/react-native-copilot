@@ -47,6 +47,7 @@ const copilot = ({
   wrapperStyle,
   maskBorderRadius,
   circleSteps = [],
+  waitBeforeSteps = [],
 } = {}) => (WrappedComponent) => {
   class Copilot extends Component<any, State> {
     state = {
@@ -88,8 +89,11 @@ const copilot = ({
       getNextStep(this.state.steps, step);
 
     setCurrentStep = async (step: Step, move?: boolean = true): void => {
-      await this.setState({ currentStep: step });
       this.eventEmitter.emit('stepChange', step);
+      if (waitBeforeSteps.includes(step.order)) {
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+      await this.setState({ currentStep: step });
 
       if (move) {
         this.moveToCurrentStep();
